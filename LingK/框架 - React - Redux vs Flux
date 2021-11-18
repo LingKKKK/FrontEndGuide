@@ -1,0 +1,164 @@
+# React Redux Flux 之间的关系
+    React 和 Redux、Flux 本质上是没有任何关系的, 只是调用 Redux、Flux 做数据状态管理工具
+    Redux 在思想上借鉴了 Flux, 是 Flux 的升级版. 都是脸书开源的框架
+    Redux 更倾向于函数式编程的数据层实现. 和 Flux 最大的区别是: Redux 使用不可变的单一状态树管理应用程序.
+    使用 Redux 充当数据层, 也完全兼容 Flux 架构, 对视图层也没有任何倾向性.
+
+# Flux 介绍
+    Flux 四大元素:
+      Dispatcher: 根据注册派发 action
+      Store: 存储数据, 处理数据
+      Action: 用于驱动 Dispatcher
+      View: 用户界面视图
+
+      Dispatcher: 是全局唯一的 dispatcher 对象, 关系网的中心
+```JavaScript
+  import {Dispatcher} from 'flux';
+  export default new Dispatcher ();
+```
+      Store: 需要注册到 Dispatcher 上, 加入关系网之后才能生效, 通过 emit 广播, on 挂载事件.
+             单向数据流的核心就是: dispatcher 派发 action 之后, 触发回调, 还会将处理结果置入 Store 中.
+      Action: 纯数据的对象, 用于驱动 dispatcher, 不含任何逻辑, 仅仅作为驱动工具
+      View: 用户在页面中调用 action →→→ dispatcher →→→ Store →→→ View
+
+    Flux 目的: 为了解决 MVC 框架无法完全隔绝 Model 和 View 通信的缺点.
+    Flux 做法: store之后 get 方法, 没有 set 方法, 所以 View 层只能 get 获取到 store 状态, 不能修改.
+              如果想要修改, 只能派发一个 action 给 dispatcher, 由 action 中对应的方法进行修改.
+    Flux 缺点: store之前需要建立依赖关系
+              store 替换后, 无法保持原有的储存状态(在开发阶段, store 逻辑修改, 无法热更新)
+
+# Redux 介绍
+    基本原则:
+      继承 Flux 的基本原则: 单向数据流
+      唯一数据源: store
+      保持只读状态(无法逆向修改)
+      只有纯函数能修改数据(action 是修改的唯一途径)
+    要素分析:
+      Store: 存储数据
+      Reducer: 根据 Action + state 来替换 state, 并非直接进行更改
+      Action: 定义 Action 对象
+      Component: 调用 action 对象
+
+      Store: 在 redux 中,只有一个 store,是唯一的分发对象, 因此将 Dispatcher 对象简化成 store 对象中的一个函数 dispatch
+             使用 redux 中的 createStore 这个方法, 创建应用唯一的 store, 并将其暴露到全局.
+             组件通过 getOwnState 从 store 中获取状态.
+```JavaScript
+      import {createStore} from 'redux';
+      import reducer from './Reducer.js';
+      const counterValues = {
+        'First': 0,
+        'Second': 10,
+        'Third': 20
+      }
+      const store = createStore(reducer, initValues);   // reducer表示更新状态的reducer，initValues是状态的初始值
+      export default store;
+```
+      Reducer:  Flux 直接修改 state. redux 不能直接修改, 需要通过新建一个 redux 对象覆盖之前的 redux 对象.
+```JavaScript
+      // ------------Flux版本的action------------
+      // Flux： 直接修改store状态值
+      CounterStore.dispatchToken = AppDispatcher.register( (action) => {
+        if(action.type === AcitonTypes.INCREMENT) {
+          counterValues[action.counterCaption]++;
+          CounterStore.emitChange();
+        } else if(action.type === AcitonTypes.DECREMENT){
+          counterValues[action.counterCaption]--;
+          CounterStore.emitChange();
+        }
+      })
+      // ------------Redux版本的action------------
+      // 根据state与action的值产生并返回一个新的对象
+      // 返回的这一个对象用来组装新状态对象。
+      function reducer (state,action) {
+        const {counterCaption} = action;
+        // 返回的对象是一个新的状态树
+        // ...state表示扩展拆分state数据，去除了最顶层的树结构，暴露二级节点
+        // [counterCaption]: newData 则体现了redux状态树的设计
+        // 使用组件的caption作为状态树的对应子数据字段
+        switch (action.type) {
+          case ActionTypes.INCREMENT:
+            return {...state, [counterCaption]: state[counterCaption] +1};
+          case ActionTypes.DECREMENT:
+            return {...state, [counterCaption]: state[counterCaption] -1};
+          default:
+            return state
+        }
+      }
+```
+      Action: 无返回值的操作函数, 通过调用 dispatcher 将函数派发出去.
+```JavaScript
+      // Flux之Action
+      export const increment = (counterCaption) => {
+        AppDispatcher.dispatch({
+          type: ActionTypes.INCREMENT,       // action对象类型
+          counterCaption:counterCaption      // 用于标识发出action的来源(即页面元素)
+        })
+      }
+```
+      Component: 用于声明、绑定、派发 action
+```JavaScript
+      onIncrement() {
+        // 通过dispatch派发aciton
+        store.dispatch(Actions.increment(this.props.caption));
+      }
+      render() {
+        const value = this.state.value;
+        const {caption} = this.props;
+        return (
+          <div>
+            <button onclick={this.onIncrement}>+</button>
+          </div>
+        );
+      }
+```
+
+# Redux Flux 对比
+    1. 唯一数据源
+      Flux 中,利用 dispatcher 的 waitfor 方法,保证多个 store 之间存在依赖关系, 应用比较复杂.
+      Redux 中,所有的 state 只保存在一个 store 中,整个应用只有一个 store,树形结构.
+    2. 数据只读状态
+      状态都是只读的. 只有 get 属性. 设置的话只能通过 action →→→ dispatcher →→→ store →→→ view
+    3. 只有纯函数操作改变数据
+      reducer(state, action); 不依赖, 不改变其他作用域变量的函数方法
+    4. provide 优化 props 传递
+    5. 组件拆分, 功能单一化
+
+
+# react-redux
+    因为 redux 比较底层, 可以使用成熟的管理架构 react-redux (组件拆分 + context).
+    react-redux:
+      1. connect: 连接容器组件与展示组件
+      2. Provide: 不需要自己手动实现 Provide 来获取context,可以使用组件提供的 Provide.
+
+    connect函数:
+      1. 向内传递 state, 把 store 上的状态转化成内层展示组件的 props.
+      2. 向外转发 action, 把内层展示的组件中用户动作转化成派发 dispatcher 的修改 store 动作.
+```JavaScript
+      export default connect(mapStateToProps, mapDispatchToProps)(Counter);
+      // mapStateToProps函数，向内传递state => props
+      function mapStateToProps(state, ownProps) {
+        return {
+          value: state[ownProps.caption]
+        }
+      }
+      // mapDispatchToProps函数，向外转发Action
+      // ownProps属性就是，直接传递给外层容器组件的props
+      function mapDispatchToProps(dispatch, ownProps) {
+        return {
+          onIncrement: () => {
+            dispatch(Actions.increment(ownProps.caption));
+          },
+          onDecrement: () => {
+            dispatch(Actions.decrement(ownProps.captions))
+          }
+        }
+      }
+```
+    provide:   import {Provider} from 'react-redux';
+
+# React 项目常见的目录结构
+  ReactApp
+    - reducers   // 所有的 reducer
+    - actions    // 所有的 action 构造函数
+    - components // 所有的展示组件
+    - container  // 所有的容器组件

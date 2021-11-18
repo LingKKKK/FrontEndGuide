@@ -33,6 +33,7 @@
         列表=>Vue: 从两端到中间开始对比; React: 从做到右一次进行对比;
              当一个集合, 只把最后一个节点移动到第一个时, React会移动所有的节点, Vue只移动末尾节点
            Vue更高效
+        ???? 如果diff算法认定相同,还是否进行更新
         节点=>className不同时, Vue会认定为不同的元素; React不对className进行对比, 只关注tag,key;
            React对比: tag/key !! Vue对比:tag/key/attr
       3. 遍历的原理
@@ -52,9 +53,10 @@
     相同:
       1. 都是使用虚拟dom
       2. 都是用组件化的思想, 流程基本一直
-      3. 都是mvvm响应式, 推崇单向数据流
-      4. 社区成熟, 都支持服务端的渲染(SSR)
+      3. 社区成熟, 都支持服务端的渲染(SSR)
     不同:
+      * 框架的性质不同：Vue是MVVM，React是MVC/MVP
+      * Vue双向绑定、React是单项数据流
       1. 核心思想不同
         Vue: 推崇灵活易用(渐进式开发体验), 数据可变, 双向数据绑定; => 降低前端开发的门槛
         React: 推崇函数组件化编程(纯组件), 数据不可变, 单项数据流; => 颠覆传统的开发模式
@@ -90,3 +92,13 @@
           原生的时间被包装, 所有的事件都冒泡到顶层document监听, 然后再合成事件下发;
           可以使用跨端的事件机制, 而不是和dom紧紧绑定在一起
           组件上无事件, 父子通信使用props
+
+## render
+
+    如果state变化就会触发render, 所以要对render进行优化;
+
+# MVVM MVP MVC
+
+    MVP: Model View Persenter 「是MVC的升级，Model无法作用于Persenter」
+    MVC: Model View Controller
+    MVVM: Model View ViewModel

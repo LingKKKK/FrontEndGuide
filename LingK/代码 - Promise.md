@@ -18,7 +18,7 @@
     		that.status = 'pending';
     		that.value = null;
     		that.reason = null;
-    		that.onFulfilledCB = [];
+    		that.onFulfiFlledCB = [];
     		that.onRejectedCB = [];
 
     		function _resolve(value) {

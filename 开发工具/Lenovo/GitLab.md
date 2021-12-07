@@ -1,0 +1,106 @@
+# 基本概念
+    CI：（Continuous Integration）「[kənˈtɪnjuəs][ˌɪntɪˈɡreɪʃn]」
+      持续集成，在代码开发的过程中，持续的对代码进行集成，构建以及自动化测试。
+      有了CI工具，我们可以在提交的过程中，今早的发现错误。
+    CD：（Continuous Delivery）持续交付
+    CD：（Continuous Deployment）「[kənˈtɪnjuəs] [dɪˈplɔɪmənt] 」
+      持续交付：在代码构建完毕之后，更方便的将代码上传至线上，有利于快速迭代并交付产品。
+
+# GitLab CI/CD
+    简称（gitlab CI），是基于gitlab的一套CI/CD系统。
+    可以让开发人员通过.gitlab-ci.yml， 在项目中配置CI/CD流程。
+    提交代码后，系统可以 自动/手动 的执行CI/CD流程。
+    * 配置较为简单，需要 CI Runner（Go 语言编译打包的单文件）和jobs执行平台（SSH+裸机、docker）
+
+    pipeline：流水线，每次“提交代码”和“MR”的时候，都会生成一个新的commit
+    job：任务，CI/CD的最小单位；一个commit可以执行多个job
+    stage：阶段。一个pipeline可以分为多个阶段，每个阶段可包含多个任务，一个阶段执行完毕之后才能继续向下执行。
+
+# CI/CD流程配置
+## 完整定义
+    gitlab允许编写 .gitlab-ci.yml 文件，来配置CI/CD流程：（测试 → 构建 → 部署）
+    * 定义好所有阶段、以及执行每个任务之前所需要的环境变量以及准备工作，然后定义整个流程中包含的所有任务
+    参考：https://www.jianshu.com/p/3c0cbb6c2936
+
+    常用的关键字：
+      stages： 定义构建场景
+      image：docker镜像
+      services：执行任务时所需的依赖（docker服务器/database等）
+      before_script： 定义“每个任务脚本”启动前需要执行的指令
+      after_script： 定义“每个任务脚本”执行完毕后需要执行的指令
+      variables：定义构建的变量
+      script：定义了任务需要执行的命令
+
+    * 在每个任务中，通常会包含 image, stage,services, script 等字段
+
+    测试：
+        注入Mysql数据库， 执行安装命令， 再执行单元测试的脚本
+        * 有些比较规范的项目测试流程会更完善一点，会有检查静态代码，自动化测试等内容
+        * 有些迫于进度QA压力的项目，会省略测试的过程
+    构建：
+        引入Dockerfile注入依赖，将工程打包成docker镜像并上传
+        * only/except用于环境和分支的判断
+    部署：
+        将打包好的项目进行上传，涉及到重启服务，备份文件等操作
+
+## Gitlab使用技巧
+   https://www.jianshu.com/p/3c0cbb6c2936
+
+## .gitlab-ci.yml 示例
+```yml
+    stages:
+      - test
+      - build
+      - deploy
+
+    variables:
+      IMAGE: docker.registry/name/${CI_PROJECT_NAMESPACE}-${CI_PROJECT_NAME}
+
+    before_script:
+      - IMAGE_TAG=${IMAGE}:${CI_COMMIT_SHA:0:8}
+
+    test_all:
+      image: "pymicro"
+      stage: test
+      services:
+        - name: mysql:5.6
+          alias: mysql
+      veriables:
+        MYSQL_DATABASE: db
+        MYSQL_ROOT_PASSWORD: password
+      before_script:
+        - pip install -U -r requirements.txt
+      script:
+        - flake8 app
+        - pytest tests
+
+    build_image:
+      image: "docker:17.11"
+      stage: build
+      services:
+        - name: "docker:17.12.0-ce-dind"
+          alias: dockerd
+      variables:
+        DOCKER_HOST: tcp://dockerd:2375
+      only:
+        - master
+      tags:
+        - build
+      script:
+        - docker build -t ${IMAGE_TAG} -f Dockerfile .
+        - docker push ${IMAGE_TAG}
+
+    deploy_production:
+      stage: deploy
+      variables:
+        GIT_STRATEGY: none
+      only:
+        - master
+      when: manual
+      tags:
+        - deploy-production
+      script:
+        - kubectl set image deploy/myproject "app=${IMAGE_TAG}" --record
+```
+
+# gitlab-ci runner

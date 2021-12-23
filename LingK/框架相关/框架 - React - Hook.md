@@ -67,6 +67,7 @@
     * 在调用useEffect时，就是注册一个”完成更新DOM之后会触发的回调“。
     * useEffect可以访问到props和state，他是根据props和state来进行触发的。
     * 可以根据不同的情况筛选出不同的条件（将组件内相关的副作用组合在一起）
+    useEffect参数为空时, 每次渲染的时候, 都会执行一次; 容易造成死循环.
 
 ```JavaScript
     import React, { useState, useEffect } from 'react';

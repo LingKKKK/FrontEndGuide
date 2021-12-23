@@ -36,6 +36,9 @@
         ???? 如果diff算法认定相同,还是否进行更新
         节点=>className不同时, Vue会认定为不同的元素; React不对className进行对比, 只关注tag,key;
            React对比: tag/key !! Vue对比:tag/key/attr
+
+        修改: 对比节点时,如果keytag均相同, 只有className不同, Vue会认为是不同类型的元素, 删除重建. react会认定相同的元素, 仅替换属性, 不会删除重建.
+
       3. 遍历的原理
         React: 首位作为原点, 依次对内容遍历
         Vue  : 使用双向链表, 边对比边更新Dom

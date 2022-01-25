@@ -32,18 +32,37 @@
 
     这是 Vue 独有的特性, 其他实现响应式的都是侵入性响应式. 并非原始的响应式...
     响应: 一部分内容改变, 从而达到局部/全局更新 →→→ 发生变化时, 发布者和订阅者都会产生影响;
-    其核心的内容是 data添加的 Observer 和 Dep, 核心的方法是 dep.notify() ;;;;
+    其核心的内容是 data添加的 Observer 和 Dep, 核心的方法是 dep.notify() ;;;; [notify → 通知/通告]
     利用Object.defineProperty属性, 对data中的属性进行 get set监听, 在发生变化时, 触发 dep.notify(), 调用对应 watcher 的 _update 方法;
 
         init 初始化
-            ↓
-    Observer建立响应式的对象 → Dep {}
-            ↓
+            ⬇️
+    Observer建立响应式的对象 ➡️ Dep {} ➡️ 每次创建Observer实例, 同时会创建一个Dep实例
+            ⬇️                         并让get中的watcher和dep相互记录 → 多对多/观察者
+            ⬇️                         此时get/set并未执行, 所以不是真正的记录
+            ⬇️
     交给 Object.defineProperty() 进行响应式化
-            ↓ →→→ 依赖收集(Dep)
+            ⬇️ ➡️ ➡️ ➡️ 依赖收集(Dep)
     渲染 Watcher, 给 Data 数据添加 Dep 依赖
-            ↓ →→→ 派发更新(render)
-    Dep.notify() →→→ Watch.run() →→→ _update
+            ⬇️
+            ⬇️ ➡️ ➡️ ➡️ 派发更新(render)
+            ⬇️
+    Dep.notify() ➡️ ➡️ ➡️ Watch.run() ➡️ ➡️ ➡️ _update
+
+    1. 对数据进行了拦截：对象劫持（Object.defineProperty） 数组（AOP切面编程，对七个能改变数组方法进行拓展）
+    2. 统一render，通过template模板解析成AST语法树（描述语法）
+    3. 通过AST语法树生成render函数（可被执行的js字符串），使用with添加词法作用域，使用new Function()来执行render函数，生成虚拟Dom
+    4. 当new Vue时会产生一个watcher（渲染watcher），该watcher主要有两个功能，调用vm._update(vm._render())来创建真实节点
+
+
+    1. 初始化数据时，会生成一个Observer实例
+    2. Observer实例生成时，会产生一个Dep实例，并在get方法中让watcher与dep的相互记录（多对多关系，观察者模式，此时get/set并未执行，所以此时并未真正相互记录）
+    3. 组件挂载，执行mountComponent，此时会创建一个watcher（渲染watcher）
+    4. 执行Watcher.get方法，该方法处理三个步骤：将Dep中的target设置为该Watcher，执行渲染函数（此时会取值，触发2步骤中get，watcher与dep的相互记录），渲染之后移除Dep.target
+    5. 4步骤时，dep与Watcher已相互记录，当属性发生改变时，dep中的notify方法会将自己记录到的所有watcher都执行一次update方法，也就是触发视图更新（这里只实现到渲染watcher，所以只会记录到一个）
+    6. 视图更新，又会重新触发watcher.get方法，依赖将会重新收集（页面可能存在有v-if/v-else，所以需要重新收集）
+
+
 
 # Vue 的编译 compile
 
@@ -91,9 +110,9 @@
     虚拟dom:
       1. 是实现vue react的基石, 为了避免大量dom操作影响性能而提出的一个内容;
       2. 其核心就是js, json的形式来模拟的dom结构, 经过编译处理, 最终渲染在页面上
-      3. 虚拟dom的核心就是: vnode节点, h函数, diff算法, patch合并
+      3. 虚拟dom的核心就是: vNode节点, h函数, diff算法, patch合并
     diff算法:
-      1. 是优化vdom的主要手段, 将重绘降到最低, 对比差异打补丁(patch)
+      1. 是优化vDom的主要手段, 将重绘降到最低, 对比差异打补丁(patch)
       2. 算法优化:
          a. 比较同层级, 不同层级不进行比较 [从上到下对比]
          b. tag不同直接删除, 不进行比较 [节省时间]
@@ -113,20 +132,38 @@
     2. 在循环对比中, 遍历的效率要远低于映射, 有key值会优先查询出来
        相当于重新渲染的了一遍dom结构, 再分别进行赋值, 效率远低于针对性的查询替换;
 
-# Vuex
+# vue中的data为什么是函数的形式
+    * 让数据相互隔离, 仅存在于当前的组件中
+```ts
+    // 原型链的知识
+    function Component(){
+      this.data = this.data
+    }
+    Component.prototype.data = {
+        name:'jack',
+        age:22,
+    }
+    /**
+     * 需要达成的共识:
+     * 1. 实例的构造函数内部的this内容是不一样的
+     * 2. Component.prototype 这类底下的方法或者值都是所有实例公用的
+     */
+```
+
+# VueX
 
     适用于多组件之间的通信, 某些变量需要在多个组件中公用;
     高效,同步,响应
 
     构成:
-      state: 是vuex的基本数据格式, 存放变量
+      state: 是VueX的基本数据格式, 存放变量
       getters: 是state的计算方法
       actions: 提交数据的方法, 必须是异步 [先整合所有的异步操作, 然后commit 提交到 mutation处理]
       mutation: 提交数据的方法, 必须是同步 [第一个参数是字符串, 自定义的内容, 第二个参数是回调]
         是原子操作, 不会被任何调度中断
-      modules: 将vuex模块化, 让项目的结构更加清晰, 有调理, 让项目更利于维护
+      modules: 将VueX模块化, 让项目的结构更加清晰, 有调理, 让项目更利于维护
 
-    vuex中的方法:
+    VueX中的方法:
       dispatch: 通过dispatch方法来驱动action
       commit: actions 通过 commit 进行异步整合, 提交给mutation
       mapState: 是state的辅助函数, 自动生成计算属性
@@ -134,13 +171,40 @@
       mapActions: 将组件的methods方法映射为 store.dispatch()
       mapMutations: 将组件的methods方法映射为 store.commit()
 
-    vuex的操作流程 / 驱动流程:
+    VueX的操作流程 / 驱动流程:
       在vue中, 通过dispatch来驱动actions: 提交数据的更新修改操作
       通过action中的commit来触发mutations: 修改数据(原子操作)
       mutations接受commit请求, 通过mutate来修改数据:
         如果是异步操作: dispatch > actions > commit > _event
         如果是同步操作: commit > _event
       执行完毕之后, store中存储的数据变化, 然后其相应依赖的内容也进行更新 [数据驱动视图]
+
+## VueX action | mutations 对比
+```ts
+    const store = new Vuex.Store({
+    　　state: {
+    　　　　count: 0
+    　　},
+    　　mutations: {
+    　　　　increment (state) {
+    　　　　　　state.count++
+    　　　　}
+    　　},
+    　　actions: {
+    　　　　increment (context) {
+    　　　　　　context.commit('increment')
+    　　　　}
+    　　}
+    })
+    // 流程顺序
+    '响应的操作' ▶️ '修改state'  ▶️ 操作触发"action" ▶️ "action"触发"mutations"
+    // 角色定位
+    Mutations: 专注于state的修改, 是修改state的唯一途径
+    Actions: 企业代码, 异步请求, commit触发mutations
+    // 限制
+    Mutations: 必须同步执行
+    Actions: 允许异步, 但是不能直接操作state
+```
 
 # Props 定义
 
@@ -156,6 +220,94 @@
     }
   }
 ```
+
+# v-bind
+作用: 绑定值(数据/元素属性)
+使用: v-bind 或者 : (简写)
+
+1 绑定class
+```html
+  <div :class="{ classA: isA }"></div>
+  isA为真时, 渲染结果是: class="classA"
+
+  <div :class="[classA, classB]"></div>
+  变量classA="aaa" && 变量classB="bbb"时, 渲染结果是: class="aaa bbb"
+
+  <div :class="[classA, { classB: isB, classC: isC }]">
+  classA为变量, classB,classC为常量
+  classA="aaa" && isB,isC为真时, 渲染结果是: class="aaa classB classC"
+
+  <div :class="classA"></div>
+  变量classA为'xxx'时, 渲染结果是: class="xxx"
+```
+
+2 绑定style
+```html
+  <div :style="{ fontSize: size + 'px' }"></div>
+  css属性要是用驼峰命名, font-size >> fontSize; z-index >> zIndex
+
+  <div :style="styleObjectA"></div>
+  styleObjectA: {color: 'red'}
+
+  <div :style="[styleObjectA, styleObjectB]"></div>
+  数组语法可以将多个样式对象应用到一个元素上
+```
+
+3 绑定一些变量 (绑定字面量)
+```html
+  <img :src="xxx">
+  <a :href="xxx"></a>
+  对变量xxx取值赋值;
+```
+
+4 传参绑定
+  用于组件之间的传递
+```js
+  //用于父子组件传参
+  // data.params = {"a": "123", "b": []}
+  <component v-bind="params"/>
+  // 子组件必须要声明接受
+  props: {
+    a: {
+      type: String,
+      default: ""
+    },
+    b: {
+      type: Array,
+      default: function() {
+        return []
+      }
+    }
+  }
+```
+举例:
+```shell
+  在组件components/page/self.vue中
+  1. 导入static/js/mixin/context-menu.js
+  2. 给子组件<context-menu>绑定mixin导入的属性menuData >>> v-bind="menuData"
+  3. 在子组件 context-menu.vue 中声明变量menuData >>> props: {contextMenu: Object}
+  4. 子组件就可以其使用传递过来的变量menuData
+```
+
+5 v-bind="$attrs" 做多层组件的监听
+- 组件之间的通信有很多方式: vuex(太重), props(层级多时太麻烦)
+- vue从2.4版本提供了一个新的方法: ```vm.$attrs```
+  - 将父组件的属性（除去在props中传入的属性）传递给子组件
+  - 是一种优化手段
+- 扩展: v-on="$listeners"
+-
+```html
+拿element-ui中input举例:
+父: <el-input maxlength="20"></el-input>
+子: <input v-bind="$attrs" />
+未使用props和vuex, 依然可以将追加的属性maxlength传递给子组件中
+>>> 通过这种方法, 实现组件属性的透传
+```
+
+思考: 我们是否有必要使用vm.$attrs?
+
+[参考](https://www.cnblogs.com/jin-zhe/p/13099416.html)
+
 
 # v-model
 
@@ -256,6 +408,15 @@
     2. 在templete中, 使用v-if来控制组件的加载 [注意v-if v-show的区别]
     * 尽量避免同步加载大量的组件, 也出于性能问题
 
+# v-if | v-show
+- 共同点: 都能控制组件的显示和隐藏
+- 不同点:
+      1. v-show: 控制display属性; v-if: 控制组件的渲染和销毁
+      2. v-show: 首次渲染的开销较大, 之后的开销较小; v-if: 首次渲染的开销很小
+      3. v-show: 切换开销较小; v-if: 切换开销较大
+      4. v-if: 有对应的v-else-if/v-else命令; v-show没有
+      5. v-if: 可以搭配templete使用; v-show不行
+
 # keep-alive 缓存组件
 
     1. 在频繁切换时, 使用缓存组件, 会节省很多内容存
@@ -307,28 +468,38 @@
 ```
 
 # watch computed 对比
+  Computed: 计算属性
+    创建vue实例中的计算属性, 属性值为一个对象, 对象里是各种计算, 最后将结果return出来.
+    值可以不设置在data中, 设置也不报错
+    和data里面的属性一样, 有依赖关系, 依赖不变计算属性就不触发.
+    是同步的过程, 可以触发其他的方法, 但是不能写异步的逻辑, 因为计算是同步的
+  Watch: 侦听器
+    在data中必须设置值, 否则会报错
+    是监听的意思, 对data中的数据进行监听, 触发一些操作, 允许处理异步逻辑.
+    开销较大
+    默认是浅监听, 可以配置 immediate/deep 属性
+  * computed watch 可以同时对一个值进行监听, 执行顺序: computed > watch
+  * 可以配合使用, computed监听值变化, watch执行事件(同步/异步)
 
-    watch:
-      1. 默认是浅监听
-      2. watch监听引用类型, 无法获取到oldValue, 因为只能追到地址, 无法追到值
-      3. 自动触发
-      4. 挂载在this下的所有属性都可以监听
-      5. 适用于data变化后执行异步操作, 或者开销比较大的操作
-      6. 占用的资源比较大
-    computed:
-      1. 自动触发
-      2. 基于响应式的依赖. [多了一层依赖关系]
-      3. 值不在data中, 设置的话会报错
-      4. 适用于简单的计算
-
-```JavaScript
+```js
   computed: {
-    aaa: function() {
+    aaa: function() { // 默认
       return this.bbb + this.ccc
+    },
+    aaa: { // 拓展
+      get: function() { // getter
+        return this.bbb + this.ccc
+      },
+      set: function() { // setter
+        this.ddd = this.aaa
+      }
     }
   },
   watch: {
-    aaa: {
+    aaa: function(val, oldVal) { // 默认
+      console.log(val, oldVal);
+    }
+    aaa: { // 拓展
       handle (val, oldVal) {
         console.log(val, oldVal);
       },

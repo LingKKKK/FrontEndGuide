@@ -74,7 +74,7 @@ Role-Based Access Control: 以角色为基础的访问控制
 
     1.动态路由表
       - 在身份切换或者获取不到身份的时候重新请求路由
-      router.beforeEach  --检查Token-->  确保Token无误  --获取动态路由-->  展示身份对应的路由
+      router.beforeEach  -检查Token->  确保Token无误  -获取动态路由->  展示身份对应的路由
     2.静态路由表
       id auth component 等自定义的属性标签
     3.每次访问接口的时候,都会携带token,通过token判断可访问性

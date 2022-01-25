@@ -1,66 +1,126 @@
 # 基础
 ## 定义函数
     let add:(x: number, y: number) => number
-
+# 拓展
 ## as 和 ? !
-
     as 断言他的类型
     ! 确定存在
     ? 不确定是否存在
-
-## 基础类型
-    定义最简单的数据单元：数字、字符串、结构体、布尔值等
-    boolean、number、string、null、undefined
-    number[]、Array<number> 定义内容为number的数组结构
-    数组：数组合并了“相同类型”的对象
-    元组：元组合并了“不同类型”的对象
-    void：无任何返回值
-    任意值：any，在any上访问任何属性都是允许的，也允许调用任何方法；且所有的返回值都是any
-          如果声明变量的时候未指定类型，默认是any类型。
-    联合类型：取值为多种类型中的一种。使用分隔符"|"将类型隔开。
-    接口：Interfaces，用来定义对象的类型。接口的首字母一般都是大写的；
-
+## type interface 对比
+    type aliases: 类型别名
+    interfaces: 接口
+    type拥有interfaces的绝大多数特征;
+    1. interface是可拓展的, type不能重新打开添加新属性; interfaces-extend/type-&-|实现拓展
+    2. type拥有typeof keyof in 等拓展功能
+    ※ 尽量使用interfaces, 因为interfaces更符合js对象的工作性质
+    ※ 当无法通过interfaces来描述某些形状, 或者需要使用联合类型元组类型时, 使用type来进行表达
+    ※ interfaces是最佳选择, type是最次方案
+[参考](https://blog.csdn.net/weixin_42321819/article/details/119982289)
 ```ts
-    let bool: boolean = true;
-    let tuple: [string, number] = ["aa", 11];
-    let anyThing: any = "hello";
-    let a = "string"; // a 是string类型
-    let a;
-    a = "string"; // a 是any类型
-    let bbb: string | number;
-    bbb = "seven";
-    bbb = 7;
-    // 定义了基本的类型，必须按照接口定义好的数据声明；
-    interface Person {
-      name: string;
-      age: number;
+  // 声明一个类型时 interface 和 type 没有区别;
+  // 都可以进行接口类型的定义, readonly public ? ! [] 用法都相同
+  interface Point = {
+    a: number;
+  }
+  type Point = {
+    a: number;
+  }
+  // 类型别名时, 只能使用 type, 不能使用 interface
+  type ID = number | string;
+  type ID = number;
+  // 拓展类型
+  // interface可以通过extend来拓展类型, 允许interface/type aliases
+  interface Super {
+    a: string;
+  }
+  interface Sub extends Super {
+    b: number;
+  }
+  // type 通过交叉类型 & 来实现拓展 (测试发现 & | 都可以实现)
+  type Super = {
+    a: string;
+  };
+  type Sub = Super & {
+    b: number
+  };
+  // type aliases 有很多扩展语法 typeof keyof in
+  interface A {
+    x: number;
+    y: string;
+  }
+  // 拿到 A 类型的 key 字面量枚举类型，相当于 type B = 'x' | 'y'
+  type B = keyof A;
+  const json = { foo: 1, bar: 'hi' };
+  // 根据 ts 的类型推论生成一个类型。此时 C 的类型为 { foo: number; bar: string; }
+  type C = typeof json;
+  // 根据已有类型生成相关新类型，此处将 A 类型的所有成员变成了可选项，相当于 type D = { x?: number; y?: string; };
+  type D = {
+    [T in keyof A]?: A[T];
+  };
+```
+## 基础类型
+```ts
+    // 布尔值
+    let isClick:boolean = false
+    // 数字
+    let num:number = 0; // 允许 2 8 10 16 进制
+    // 字符串
+    let str:string = "嗯" // 允许使用字符串模板
+    // 数组: 合并相同类型
+    let arr1:number[] = [1,2,3] // 使用类型
+    let arr2:Array<number> =[1,2,3] // 使用泛型
+    interface arr { [index: number]: number } // 使用接口定义
+    // 元组: 合并不同类型
+    let tuple:[string, number] = ['1', 2];
+    // 枚举
+    enum Color {Red, Blue, Yellow}
+    let color:Color = Color.Red
+    // 特殊类型
+    any(任意类型) / 没有类型(void) [含义相反]
+    null & undefined [类型]
+    // never 永远不存在的类型
+    function error(message: string): never { // 永远不会走到头, 会抛出异常
+      throw new Error(message)
     }
-    // 定义了任意属性和可选属性，name必须存在，age可以存在，其他的不确定元素必须都是字符串
+    // object 非原始类型: 除了基本类型之外的类型
+    declare function create(o: object | null): void // 只能传入"非基本|null"类型的参数
+    create({ prop: 0 }) // OK
+    create(null) // OK
+    create(42) // Error
+    create('string') // Error
+```
+## 基础类型 对象类型 高级类型
+    基础类型: string number boolean null undefined bigint symbol
+    对象类型: object
+    高级类型: 联合类型(Unions Type ) 泛型(Generics)
+## 对象的类型 - 接口
+    在ts中使用接口(Interface)来定义对象的类型
+    类似声明一个约定(描述接口的形状), 接口声明和使用时要遵循这个约定
+```ts
     interface Person {
+      readonly id: number;
       name: string;
       age?: number;
-      [propName: string]: string;
+      [propName: string]: string | number; // 一旦定义, 所有的属性必须都遵循这个原则 (其他设置会失效)
     }
+    // 定义的变量要和接口一致, 不能多也不能少
+    // 如果存在任意属性, 需要加上 null undefined
 ```
-
 ## 数组的类型
-
-    1.「类型 + 方括号」表示法
+1.「类型 + 方括号」表示法
       let fibonacci: number[] = [1, 1, 2, 3, 5];
       不允许出现其他类型，在设定的时候，会对类型加以约束
-    2. 数组泛型： Array<elemType>
+2.数组泛型
+			Array<elemType>
       let fibonacci: Array<number> = [1, 1, 2, 3, 5];
-    3. 用接口表示
-
+3.用接口表示
 ```ts
     interface NumberArray {
       [index: number]: number;
     }
     let fibonacci: NumberArray = [1, 1, 2, 3, 5];
 ```
-
-    4. 类数组
-
+4.类数组
 ```ts
     function sum() {
       let args: {
@@ -121,29 +181,23 @@
 ```
 
 ## 类型断言
-
-    类型断言：用来手动指定一个值的类型 <类型>值
-    * 使用断言类型来欺骗编辑器，避免了因为类型产生的报错
-    * 断言只会影响编译的过程，在编译完毕之后，会将断言的内容删掉
-    * 断言，不同于：类型转换、类型声明、泛型
+    类型断言：用来手动指定一个值的类型 <类型>值 : 当已经明确某一个值类型时
+    ※ 使用断言类型来欺骗编辑器，避免了因为类型产生的报错
+    ※ 断言只会影响编译的过程，在编译完毕之后，会将断言的内容删掉
+    ※ 断言，不同于：类型转换、类型声明、泛型
+    断言只有两种形式:
+      1. 值as类型
+      2. <类型>值
+      tips: 在jsx中, 只允许使用as
 ```ts
-    interface Cat {
-      name: string;
-      run(): void;
-    }
-    interface Fish {
-      name: string;
-      swim(): void;
-    }
-    function isFish(animal: Cat | Fish) {
-      if (typeof (animal as Fish).swim === "function") {
-        return true;
-      }
-      return false;
-    }
+    // <> 尖括号语法
+    let someValue: any = 'this is a string'
+    let strLength: number = (<string>someValue).length
+    // as 语法
+    let soValue: any = 'this is a string'
+    let soLength: number = (soValue as string).length
 ```
-
-    ***
+    ※
     1. 联合类型可以被断言成其中的一个类型
     2. 父类可以被断言成子类
     3. 任何类型都可以被断言成any
@@ -154,22 +208,24 @@
 
     * 必须以 ".d.ts" 结尾.
     当一个第三方库没有提供声明文件时, 需要手动添加声明.
-    在不同场景下, 声明文件的内容和使用有所不同:
-
+    在不同场景下, 声明文件的内容和使用有所不同
     全局变量的声明文件有下面几种:
       declare var 声明全局变量
       declare function 声明全局方法
       declare class 声明全局类
       declare enum 声明全局枚举类型
       declare namespace 声明（含有子属性的）全局对象
-      interface 和 type 声明全局类型
-      * 全局定义的变量, 大多数使用const, 不允许再被修改
+    		interface 和 type 声明全局类型
+    	※ 全局定义的变量, 多数使用const, 不允许再被修改
 
 ## 内置对象
+		Error Date RegExp
 
 # 进阶
-## 类型别名(重新命名)
-    用于给一个类型起一个新的名称
+
+## 类型别名 Type Aliases
+    用于给一个类型起一个新的名称; 起一个新的名字, 并非定义新类型, 原来的也可以使用
+    常用于: 基础类型 / 联合类型
 ```ts
     type Name = string;
     type NameResolver = () => string;
@@ -222,35 +278,25 @@
     declare enum Directions {Up,Down,Left,Right}
     let directions = [Directions.Up, Directions.Down, Directions.Left, Directions.Right];
 ```
-
-## type interface
-    type: 类型别名, 字符串字面量类型;
-    interface: 接口(对象)；对类的一部分进行抽象，也可以对「对象的形状」进行描述
-      当定义对象结构时：
-        定义的类型不能多也不能少。赋值的时候，变量必须和接口设定的形状保持一致。
-        可以使用“？”来定义可选属性
-        可以使用“[propName: string]: any;”来定义任意属性
-        可以使用“readonly”来定义只读属性；「允许get，不允许set」
-      当定义函数结构时：
-        定义了函数的结构: 参数类型 返回值
-
 ## 类
-    JS通过构造函数实现类, 通过原型链实现继承. 在ES6中有了class.
+JS通过构造函数实现类, 通过原型链实现继承. 在ES6中有了class.
 
-    类（Class）：定义了一件事物的抽象特点，包含它的属性和方法
-    对象（Object）：类的实例，通过 new 生成
-    面向对象（OOP）的三大特性：封装、继承、多态
-    封装（Encapsulation）：将对数据的操作细节隐藏起来，只暴露对外的接口。外界调用端不需要（也不可能）知道细节，就能通过对外提供的接口来访问该对象，同时也保证了外界无法任意更改对象内部的数据
-    继承（Inheritance）：子类继承父类，子类除了拥有父类的所有特性外，还有一些更具体的特性
-    多态（Polymorphism）：由继承而产生了相关的不同的类，对同一个方法可以有不同的响应。比如 Cat 和 Dog 都继承自 Animal，但是分别实现了自己的 eat 方法。此时针对某一个实例，我们无需了解它是 Cat 还是 Dog，就可以直接调用 eat 方法，程序会自动判断出来应该如何执行 eat
-    存取器（getter & setter）：用以改变属性的读取和赋值行为
-    修饰符（Modifiers）：修饰符是一些关键字，用于限定成员或类型的性质。比如 public 表示公有属性或方法
-    抽象类（Abstract Class）：抽象类是供其他类继承的基类，抽象类不允许被实例化。抽象类中的抽象方法必须在子类中被实现
-    接口（Interfaces）：不同类之间公有的属性或方法，可以抽象成一个接口。接口可以被类实现（implements）。一个类只能继承自另一个类，但是可以实现多个接口
+- 类（Class）：定义了一件事物的抽象特点，包含它的属性和方法
+- 对象（Object）：类的实例，通过 new 生成
+- 面向对象（OOP）的三大特性：封装、继承、多态
+- 封装（Encapsulation）：将对数据的操作细节隐藏起来，只暴露对外的接口。外界调用端不需要（也不可能）知道细节，就能通过对外提供的接口来访问该对象，同时也保证了外界无法任意更改对象内部的数据
+- 继承（Inheritance）：子类继承父类，子类除了拥有父类的所有特性外，还有一些更具体的特性
+- 多态（Polymorphism）：由继承而产生了相关的不同的类，对同一个方法可以有不同的响应。比如 Cat 和 Dog 都继承自 Animal，但是分别实现了自己的 eat 方法。此时针对某一个实例，我们无需了解它是 Cat 还是 Dog，就可以直接调用 eat 方法，程序会自动判断出来应该如何执行 eat
+- 存取器（getter & setter）：用以改变属性的读取和赋值行为
+- 修饰符（Modifiers）：修饰符是一些关键字，用于限定成员或类型的性质。比如 public 表示公有属性或方法
+- 抽象类（Abstract Class）：抽象类是供其他类继承的基类，抽象类不允许被实例化。抽象类中的抽象方法必须在子类中被实现
+- 接口（Interfaces）：不同类之间公有的属性或方法，可以抽象成一个接口。接口可以被类实现（implements）。一个类只能继承自另一个类，但是可以实现多个接口
 
-    属性和方法:
+-  属性和方法
       使用class定义类, 使用constructor来定义构造函数
       使用new来生成新实例的时候, 会自动调用构造函数.
+
+## 类与接口
 ```ts
       class Animal {
         public name;
@@ -264,7 +310,7 @@
       let a = new Animal('Jack');
       console.log(a.sayHi()); // My name is Jack
 ```
-    类的继承:
+    类的继承
       使用extend关键字来实现继承, 子类中使用super关键字来调用父类的构造函数和方法.
 ```ts
       class Cat extends Animal {
@@ -279,8 +325,8 @@
       let c = new Cat('Tom'); // Tom
       console.log(c.sayHi()); // Meow, My name is Tom
 ```
-    存取器:
-      使用getter, setter可以改变属性的赋值和读取行为.
+    存取器
+      使用getter, setter可以改变属性的赋值和读取行为
 ```ts
       class Animal {
         constructor(name) {
@@ -297,7 +343,7 @@
       a.name = 'Tom'; // setter: Tom
       console.log(a.name); // Jack
 ```
-    静态方法:
+    静态方法
       static关键字声明的是静态方法, 不需要实例化, 直接通过类进行调用. {必须通过类进行调用}
 ```ts
       class Animal {
@@ -309,8 +355,8 @@
       Animal.isAnimal(a); // true
       a.isAnimal(a); // TypeError: a.isAnimal is not a function
 ```
-    TS中的类方法:
-      修饰符:
+    TS中的类方法
+      修饰符
         public: 修饰的属性和方法是共有的, 在任何地方都允许访问到, 所有默认的属性和方法都是public的.
         privite: 修饰的属性和方法是私有的, 不能在类的外部访问
         protected: 修饰的属性和方法是受保护的, 他和private类似, 在子类中允许访问.
@@ -351,7 +397,7 @@
           console.log(`${this.name} is eating.`);
         }
       }
-      let cat = new Cat('Tom');
+      let cat = Wnew Cat('Tom');
       // index.ts(9,7): error TS2515: Non-abstract class 'Cat' does not implement inherited abstract member 'sayHi' from class 'Animal'.
 ```
 
@@ -360,7 +406,9 @@
     eg. 门是一个大类, 防盗门是门的子类, 在做防盗门的时候, 可以实现报警,指纹识别等功能
 
 ## 泛型 Generics  [dʒɪˈnɛrɪks]
-    在定义函数, 接口, 类的时候, 不预先指定具体的类型, 在使用的时候再去指定的一种特性.
+
+在定义函数, 接口, 类的时候, 不预先指定具体的类型, 在使用的时候再去指定的一种特性.
+
 ```ts
     // 数组的泛型 [能成功返回, 无法精确的要求输入和输出的类型相同]
     function createArray(length: number, value: any): Array<any> {
@@ -381,9 +429,10 @@
     }
     createArray<string>(3, 'x'); // ['x', 'x', 'x']
     createArray(3, 'x'); // ['x', 'x', 'x'] // 可以不指定返回值, 让函数自己进行判断
-
+    
+函数名后添加了 <T>，其中 T 用来指代任意输入的类型，在后面的输入 value: T 和输出 Array<T\> 中即可使用
 ```
-    函数名后添加了 <T>，其中 T 用来指代任意输入的类型，在后面的输入 value: T 和输出 Array<T> 中即可使用
+
 ### 多类型参数: 在定义泛型的时候, 可以一次性定义多个参数
 ```ts
     function swap<T, U>(tuple: [T, U]): [U, T] {
@@ -464,3 +513,43 @@
 ```
 ## 声明合并
     如果定义了两个相同名称的函数,接口或者类, 它们会被合并成一个类型.
+    合并规则:
+      1. 允许重复, 但是重复属性对应的值必须相同(不能先定义string, 再定义number)
+      2. 类的合并和函数的合并规则一样
+```ts
+    // 函数的合并
+    function reverse(x: number): number;
+    function reverse(x: string): string;
+    function reverse(x: number | string): number | string {
+      if (typeof x === 'number') {
+        return Number(x.toString().split('').reverse().join(''));
+      } else if (typeof x === 'string') {
+        return x.split('').reverse().join('');
+      }
+    }
+    // 对象的合并
+    interface Alarm {
+      price: number;
+    }
+    interface Alarm {
+      weight: number;
+    }
+```
+
+# 扩展
+## 一些拓展语法
+```ts
+  & 交集: [A, B] & [B, C] => [B]
+  | 并集: [A, B] | [C, D] => [A,B,C,D]
+  ! 用在变量前: 取反 let a = !b;
+    用在变量后: 赋值其他类型, 并确保编译通过
+      let a = number;
+      a = null! undefined! (正常情况下null undefined是不允许编译通过的)
+    断言变量: A!.B 断言A一定不为空, 可以向下取B值
+  ? 可选参数: { x?: number }
+    无法确定是否为空: A?.B (对于一个可能未空的属性进行断言,确保可以运行通过)
+  ?? 三目运算: a.b ?? [] --> a.b ? a.b : []
+```
+
+TypeScript 混入、类型推断、交叉类型、联合类型、声明合并、类型兼容性
+https://www.jianshu.com/p/e354de8a7ade

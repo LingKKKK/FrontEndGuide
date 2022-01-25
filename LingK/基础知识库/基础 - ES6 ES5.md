@@ -71,6 +71,6 @@ es6 中的箭头函数 () => {}
           console.log(key + "'s phone number is: " + value);
         }
 
-# 对字符串的操作
+遍历的方式和区别: https://www.cnblogs.com/hexiaobao/p/12108572.html
 
-# 对数组的操作
+# 解构赋值

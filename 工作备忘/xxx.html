@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="aaa"></div>
+  <script>
+    (function() {
+      var aaa = document.getElementById("aaa");
+      var Input = document.createElement("input");
+      aaa.append(Input);
+
+
+
+      function debounce(delay) { // 声明debounce方法
+        var timer = null; // 在函数debounce体内设置timer, 和下面的调用组成一个闭包
+        var _debounce = function() { // 函数处理方法
+          clearTimeout(timer);
+          timer = setTimeout(function() {
+            // todo
+            clearTimeout(timer);55555555555555
+            timer = null;
+          }, 2000)
+        }
+        return _debounce // 将函数体返回
+      }
+
+      Input.oninput = debounce(2000) // 将 debounce(2000) 返回结果绑定到onInput上
+
+      // 代码逐行运行,但是执行顺序遵循事件循环的机制
+
+
+    }())
+  </script>
+</body>
+</html>

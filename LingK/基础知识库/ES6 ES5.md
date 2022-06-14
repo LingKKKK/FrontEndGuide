@@ -7,24 +7,33 @@ es6 中的箭头函数 () => {}
 - 如果想使用参数,必须使用剩余参数表示法(枚举展示) (...params) => {}
 - 箭头函数不能作为构造函数,所以在需要匿名的地方使用更好
 
-# Array 新增 API
+# String 新增的API
+  1. String.includes('xxx') 判断是否包含某字符串 等同于:ES5中indexOf方法
+  2. String.startsWith('xxx') 判断是否以某字符串开头 返回true/false
+  3. String.endsWith('xxx') 判断是否以某字符串结尾 返回true/false
+  4. String.repeat(x) 将字符串重复x次 返回重复之后的字符串
+  5. String.padStart(length, 'x') 将字符串前面补充某字符串
+  6. String.padEnd(length, 'x') 将字符串后面补充某字符串
+  7. for...of 循环遍历字符串
 
-    1.Array.of(arg)
-      将一些数据转化成一个新的数组
-      Array.of(1,2,3,4,5) => [1,2,3,4,5]
-    2. Array.from(arg)
-      将类数组对象转化成一个新的数组
-      let arrayLike = {0: 'tom',  1: '65', 'length': 2 }
-      Array.from(arrayLike) => ['tom','65']
-    3.find
-      查询到对应的值
-    4.findIndex
-      查询到对应的序号
-    5.includes
-      判断数组中是否包含某个值
-      类似 Object.is
+# Array 新增的API
 
-# Object 新增 API
+  1.Array.of(arg)
+    将一些数据转化成一个新的数组
+    Array.of(1,2,3,4,5) => [1,2,3,4,5]
+  2. Array.from(arg)
+    将类数组对象转化成一个新的数组
+    let arrayLike = {0: 'tom',  1: '65', 'length': 2 }
+    Array.from(arrayLike) => ['tom','65']
+  3.find
+    查询到对应的值
+  4.findIndex
+    查询到对应的序号
+  5.includes
+    判断数组中是否包含某个值
+    类似 Object.is
+
+# Object 新增的API
 
     1.Object.assign
       对象合并/深拷贝

@@ -4,6 +4,8 @@
     "destory",
     "instanceof",
     "keyof",
+    "proto",
+    "snabbdom",
     "substr",
     "typeof",
     "webcore"

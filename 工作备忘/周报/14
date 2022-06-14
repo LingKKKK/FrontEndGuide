@@ -1,0 +1,25 @@
+【周报】岳鹏飞 2022/3/11
+
+<fe@lenovocloud.com>;
+<yuanpeng@lenovocloud.com>;<wangzy@lenovocloud.com>;<yuanlei@lenovocloud.com>;
+
+本周工作内容
+    1. 解决线上遗留bug
+    2. review压缩包预览代码
+    3. filez-design项目
+
+下周工作安排
+    1. 大巴三期部分模块的分支未创建
+
+
+思考体会
+    1. 看到我们的项目中，使用到了 JSON.parse(JSON.stringify(obj)) / Object.assign({}, data);
+       有些是为了做数据拷贝, 有些是为了合并数据
+       api性能对比：https://zhuanlan.zhihu.com/p/33489557
+    2. 轮询, 尾递归; 性能对比
+    3. 迁移代码需要注意的问题/需要怎么做/容易出现哪些问题
+
+    使用Promise.then来模拟一个异步分页请求
+
+其他周知事项
+    无

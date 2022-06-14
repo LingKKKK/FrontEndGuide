@@ -4994,6 +4994,7 @@ da
         // internal component options needs special treatment.
         initInternalComponent(vm, options);
       } else {
+        // 将`options`拓展到`$option`中
         vm.$options = mergeOptions(
           resolveConstructorOptions(vm.constructor),
           options || {},

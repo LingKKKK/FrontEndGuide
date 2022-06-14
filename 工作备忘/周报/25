@@ -1,0 +1,32 @@
+【周报】岳鹏飞 2022/5/14
+
+<fe@lenovocloud.com>;
+xuyb@lenovocloud.com;<wangzy@lenovocloud.com>;<yuanlei@lenovocloud.com>;
+
+本周工作内容
+  1.演示信创特性代码合并流程
+  2.信创文案概要设计
+  3.定位处理线上问题
+  4.review信创特性代码
+
+下周工作安排
+  1.js2Native梳理
+  2.review信创web工程打包流程
+  3.2021_patch10合入大巴三期
+  4.大巴三期四轮提测
+
+思考体会
+  1. fork中的图谱怎么看?
+  2. 可视化正则表达式
+
+
+其他周知事项
+  无
+
+
+明日安排:
+  1. 大巴三期线上遗留问题定位
+  2. 核对view/doc_preview项目改动
+  3. 看patch10bug的情况, 准备合并patch10代码
+  4. 打包大巴三期,准备四轮提测
+  5. 协调一个自测环境,测试信创2022

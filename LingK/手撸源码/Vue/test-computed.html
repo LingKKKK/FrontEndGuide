@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="./vue.js"></script>
+</head>
+<body>
+  <div id="app">
+    {{message}} {{message1}}
+  </div>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        message: `1`,
+        message1: `2`
+      },
+      // computed: {
+      //   formatMessage: function () {
+      //     return `Hello ${this.message}!`
+      //   },
+      //   testComputed: {
+      //     get: function() {
+      //       console.log(`%c获取message >> ${this.message}`, "color: pink")
+      //       return `Hello ${this.message}!`
+      //     },
+      //     set: function(value) {
+			// 			this.message = value
+      //     }
+      //   },
+      //   aaa() {
+      //     console.log(`%c获取session`, "color: pink")
+      //     return sessionStorage.getItem('aaa') ?? '123'
+      //   }
+      // },
+      // watch: {
+      //   message(newVal, oldVal) {
+      //     // console.log('message: ', newVal, oldVal);
+      //   },
+      //   message1: {
+      //     handler(newVal, oldVal) {
+      //       // console.log('message1: ', newVal, oldVal);
+      //     },
+      //     immediate: true,
+      //     deep: true,
+      //   }
+      // },
+      created() {},
+      mounted() {
+        this.message = 'Hello'
+        this.message1 = 'Ry'
+        this.$nextTick(() => {})
+      }
+    })
+  </script>
+</body>
+</html>

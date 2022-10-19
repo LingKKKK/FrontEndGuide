@@ -12,9 +12,9 @@ Vue2.0在重构时,在ES2015的基础上,除了使用ESlint之外,还引入了Fl
 
 # 编译
 ## 编译入口
-## parse
-## optimize
-## codegen
+## parse -> 解析
+## optimize -> 优化
+## codegen -> 编码
 
 
 # 数据驱动

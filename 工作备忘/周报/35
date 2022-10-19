@@ -1,0 +1,24 @@
+【周报】岳鹏飞 2022/7/31
+
+<fe@lenovocloud.com>;
+xuyb@lenovocloud.com;<wangzy@lenovocloud.com>;<yuanlei@lenovocloud.com>;
+
+本周工作内容
+  1.跟进930分库分表进度
+  2."在线文档协同工具替代方案"模块划分,预研
+
+下周工作安排
+  1.跟进930分库分表进度
+  2."在线文档协同工具替代方案",对编辑器模块进行改造,尝试兼容三方插件
+
+思考体会
+  package.json中对依赖的管理:
+    Dependencies: 这里的依赖是会被最终构建到部署环境
+    DevDependencies: 仅用于开发过程中的依赖
+    PeerDependencies: 声明依赖的版本,让依赖层级更扁平化
+    https://baolei.blog.csdn.net/article/details/121008614
+  前端自动化测试框架: Cypress
+    https://zhuanlan.zhihu.com/p/453642671
+
+其他周知事项
+  无

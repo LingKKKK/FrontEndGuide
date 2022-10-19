@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>pubAndSub</title>
+</head>
+<script>
+  let hasMessageChannel = !!MessageChannel;
+  let eventsList = {};
+  let mediator;
+
+  function runTask(task, data) {
+    try {
+      task[0].call(task[1] === undefined ? task[0] : task[1], data);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  function Queue() {
+    this.Q = [];
+  }
+
+  Queue.prototype = {
+    add(task) {
+      this.Q.push(task);
+    },
+    handle(data) {
+      this.Q.forEach((task) => {
+        runTask(task, data);
+      });
+    }
+  }
+
+  const useMessageChannel = {
+    channel: hasMessageChannel ? new MessageChannel() : null,
+    register(eventType) {
+      // TODO: 覆盖/追加/阻断
+      if (!this.channel.port1.onmessage) {
+        useMessageChannel.channel.port1.onmessage = function (event) {
+          let eventItem = eventsList[event.data.eventType];
+          if (eventItem && eventItem.Q) {
+            eventItem.Q.handle(event.data.handle);
+          }
+          return false;
+        }
+      }
+    },
+    emit(eventType, detail) {
+      this.channel.port2.postMessage(detail);
+    }
+  }
+
+  const useEventListener = {
+    register(eventType) {
+      eventsList[eventType].proxy = function (event) {
+        let hander = eventsList[event.detail.eventType];
+        if (hander && hander.Q) {
+          hander.Q.handle(event.detail.handle);
+        }
+        return false;
+      }
+      document.addEventListener(eventType, eventsList[eventType].proxy, false);
+    },
+    emit(eventType, data) {
+      let event = document.createEvent('CustomEvent');
+      event.initCustomEvent(eventType, true, true, data);
+      document.dispatchEvent(event);
+    }
+  }
+
+  mediator = hasMessageChannel ? useMessageChannel : useEventListener;
+
+  const pubAndSub = {
+    on(eventType, handle, object) {
+      const task = [handle, object];
+      if (eventsList[eventType]) {
+        eventsList[eventType].Q.add(task);
+      } else {
+        let Q = new Queue();
+        Q.add(task);
+        eventsList[eventType] = { Q };
+        mediator.register(eventType);
+      }
+    },
+    emit(eventType, handle, sync) {
+      if (!eventsList[eventType]) {
+        throw new Error('未找到订阅的内容~');
+      }
+      let detail = { eventType, handle }
+      if (!sync) {
+        let hander = eventsList[eventType];
+        if (hander && hander.Q) {
+          hander.Q.handle(handle);
+        }
+      } else {
+        mediator.emit(eventType, detail);
+      }
+    },
+    off(eventType, handle, object) {
+      eventsList[eventType] && delete eventsList[eventType]
+    }
+  }
+
+</script>
+<script>
+  console.time();
+  console.log(pubAndSub, 'pubAndSub')
+  pubAndSub.on("test1",function(arg){
+    console.log(111, arg);
+    console.timeEnd();
+  }, document);
+  pubAndSub.on("test2",function(arg){
+    console.log(222, arg);
+    console.timeEnd();
+  });
+
+
+  pubAndSub.emit("test1",{
+    parm1:'A',
+    parm2:'B'
+  }, true);
+</script>
+<body></body>
+</html>

@@ -1,22 +1,42 @@
 ## this
-    在js中, this是一个关键字, 在不同的场景下, 有不同的指向;
-    this, 存在链式调用, 指向最后别调用的所属对象, 返回 xxx/undefined
-    this: 包含他的函数, 作为方法被调用时所属的对象; 一般指向语法环境;
-    场景:
-      1. 普通的函数,和定时器中,this指向window (匿名函数, 自运行函数)
-      2. 对象方法中的this,指向方法所属的对象
-      3. 构造函数中,this指向实例
-      4. 在事件绑定的方法中,this指向被绑定的dom元素
-      5. 在箭头函数中,this指向父级作用域的上下文 (在react vue中绑定的时候, 为什么要bind(this))
-      6. 在$.each()中,this指向被遍历到的元素
-      7. 对象的内部, this永远指向这个对象
-    修改:
-      通过call apply来修改this的指向
-    上下文:
-      js的执行环境
-      当js执行一段有效代码的时候,会先创建对应的上下文,包含了this VO 作用域链 闭包等内容
+
+- 在 js 中, this 是一个关键字, 在不同的场景下, 有不同的指向;
+- this, 存在链式调用, 指向最后别调用的所属对象, 返回 xxx/undefined
+- this: 包含他的函数, 作为方法被调用时所属的对象; 一般指向语法环境;
+- 场景:
+  1. 普通的函数,和定时器中,this 指向 window (匿名函数, 自运行函数)
+  2. 对象方法中的 this,指向方法所属的对象
+  3. 构造函数中,this 指向实例
+  4. 在事件绑定的方法中,this 指向被绑定的 dom 元素
+  5. 在箭头函数中,this 指向父级作用域的上下文 (在 react vue 中绑定的时候, 为什么要 bind(this))
+  6. 在$.each()中,this 指向被遍历到的元素
+  7. 对象的内部, this 永远指向这个对象
+- 修改:
+  - 通过 call apply 来修改 this 的指向
+  - [指针的修改](https://blog.csdn.net/ihtml5/article/details/115265460)
+- 上下文:
+  - js 的执行环境
+  - 当 js 执行一段有效代码的时候,会先创建对应的上下文,包含了 this VO 作用域链 闭包等内容
+
+# 为什么要修改 this 指针?
+
+```js
+var name = "lucy";
+let obj = {
+  name: "martin",
+  say: function () {
+    console.log(this.name);
+  },
+};
+obj.say(); // martin，this指向obj对象
+setTimeout(obj.say, 0); // lucy，this指向window对象
+```
+正常情况下,say方法中this的指向调用它的obj对象,而定时器中的say方法,指向window对象,因为定时器中的say是作为回调函数来执行的.
+因为执行say方法的this,是从当前的上下文取的,不同的场景对应不同的值.
+想要this指针恒指向某个变量或者环境,需要使用apply和call修改指针的指向.
 
 # 场景
+
     1. 方法调用模式
     	当函数被保存为一个对象的属性时, 他就是这个对象的方法. 当方法被调用时, this会被绑定到这个对象上;
 
@@ -58,16 +78,16 @@
     	this的指向会被修改
 
 ```javascript
-    var name = "window";
-    var person = {
-      name: "kxy",
-    };
-    function sayName() {
-      console.log(this.name);
-    }
-    sayName(); //window
-    sayName.apply(person); //kxy
-    sayName.apply(); //window
+var name = "window";
+var person = {
+  name: "kxy",
+};
+function sayName() {
+  console.log(this.name);
+}
+sayName(); //window
+sayName.apply(person); //kxy
+sayName.apply(); //window
 ```
 
 # 常见的案例
@@ -139,4 +159,3 @@
 	 * 构建实例时, 已经将构造函数内部的静态方法(1), 覆盖原来设定的静态方法(4)
 	 */
 ```
-

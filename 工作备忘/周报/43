@@ -1,0 +1,22 @@
+【周报】岳鹏飞 2022/10/07
+
+<fe@lenovocloud.com>;
+<xuyb@lenovocloud.com>;<wangzy@lenovocloud.com>;<yuanlei@lenovocloud.com>;
+
+本周工作内容
+  1. 分库分表neid精度问题联调
+  2. 优化drawio子应用
+  3. 添加UML子应用集成
+
+下周工作安排
+  1. 支持分库分表公有版本测试
+  2. 添加XMind子应用集成
+
+思考体会
+  如何优雅的链式取值: https://www.bilibili.com/read/cv5287738/
+  Webpack 打包commonjs 和esmodule 模块的产物对比: https://blog.csdn.net/weixin_53312997/article/details/125541281
+
+其他周知事项
+  无
+
+

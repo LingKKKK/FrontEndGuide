@@ -1,0 +1,10 @@
+
+
+
+
+流程：
+	1. 请求外链 _$.getData('get_delivery_info', params)
+	2. 加载缩略图 loadImage()
+	3. ...
+
+这里使用Promise.all 处理并发无序的接口请求，没有充分考虑业务场景，一旦有接口报错就会造成阻塞，使用allSettled 更合理

@@ -1,0 +1,105 @@
+【周报】岳鹏飞 2022/09/04
+
+<fe@lenovocloud.com>;
+<xuyb@lenovocloud.com>;<wangzy@lenovocloud.com>;<yuanlei@lenovocloud.com>;
+
+本周工作内容
+  1.分库分表专项-公有未分表提测
+  2.私有分库分表问题定位处理
+  3.微前端通信机制调研
+  4.私有分库分表neid精度范围整理
+
+下周工作安排
+  1.修改分库分表neid长度问题
+  2.微前端开发方向组内讨论
+  3.在线文档协同工具替代方案组内讨论
+
+思考体会
+  分库分表项目,遇到一个超长的number类型neid,引发精度丢失的问题.
+  e.g. console.log(111111111111111911); // 111111111111111900
+       console.log(JSON.parse('111111111111111911')); // 111111111111111900
+       cosnole.log(JSON.stringify({a:111111111111111911})) // 111111111111111900
+       JSON.parse(111111111111111911) // 这种无解,这里不再考虑
+  这是js自带的坑,从17位开始就四色五入.尝试了一下bigint,它也有自己的坑,而且兼容性不太好.对于这个bug,在js中是无解的.
+  最简单有效的方式: 涉及到数学运算转为bigint;涉及到存储和传递转为string.
+
+  在项目中,涉及到精度的bug,通常由JSON序列化和反序列化引发的. 尝试对JSON.parse和JSON.parse这两个api进行修改.
+  ```js
+    /**
+     * JSON.parse(text[, reviver])
+     * @text 要被解析成 JavaScript 值的字符串
+     * @reviver 转换器，如果传入该参数 (函数)，可以用来修改解析生成的原始值，调用时机在 parse 函数返回之前
+     * @return 对应给定 JSON 文本的对象/值
+     */
+    // var _parse = JSON.parse;
+    // JSON.parse = function (...args) {
+    //   console.log(args[0]) // 第一个参数是我们处理的目标元素
+    //   return _parse(...args);
+    // }
+  ```
+  我们需要修改的内容是: text中的连续数字;
+  方法一: 对回调函数进行修改;
+  ```js
+    JSON.parse('{"a": 111111111111111911}', (key, value) => value);
+    JSON.parse('{"a": 111111111111111911}', (key, value) => {
+      console.dir(Object.prototype.toString.call(value)) // [object Number]
+      console.log(key, '' + value); // 尝试固化参数 -> 失败
+      return value;
+    });
+    // 在回调函数中,对参数已经序列化了,所以强行修改格式是无效的
+    // 从js的表现来看,只要涉及到读取,变量就已经生效,精度就已经丢失;
+    // 可以参考接口的返回值,只要js尝试读取就会丢失精度
+  ```
+  方法二: 使用正则截取并修改其为string类型
+  ```js
+    const _parse = JSON.parse;
+    JSON.parse = function (...args) {
+      var output = args[0] + ''
+      console.log('output', output, Object.prototype.toString.call(output));
+      return String(args[0]);
+      // return _parse(String(args[0]));
+    }
+    // return -> '{"a": 111111111111111911}' 修改返回值成功
+  ```
+  经过尝试,证明这个方法是可行的,我们可以在返回之前做一些操作,尝试修复一下精度丢失的问题.
+  想到的方法就是: 正则匹配到纯数字的部分,然后在它前后追加"引号或者单引号"
+
+  条件: 1.纯数字部分 2.数字位数大于16
+  写正则:
+    ① 纯数字:
+      /[0-9]+/gi
+    ② 以 空格/冒号/中括号 开头:
+      /[:|:|\[|\{|\s+][0-9]+/gi -> /(?<=[:|\[|'|"|\{|\s+])[0-9]+/gi
+    ③ 以 逗号/中括号/花括号 结尾:
+      /(?<=[:|\[|'|"|\{|\s+])[0-9]+[,|'|"|\]|\}]/gi -> /(?<=[:|\[|'|"|\{|\s+])[0-9]+(?=[\]|\}|,|'|"])/gi
+
+    '{"a":1111111111111111200,"b":"22222222222222222222"}'
+    对以上JSON字符串匹配,会将两段数字都匹配
+    针对JSON.parse('111111111111111911')这样的场景,单独处理
+
+    最终得到的正则: /(?<=[:|\[|\{|\s+])[0-9]+(?=[\]|\}|,])/gi
+
+  改造的逻辑:
+  ```js
+    const _parse = JSON.parse;
+    JSON.parse = function (...args) {
+      let output = '';
+      if (...) {
+        // 过滤条件
+        // 过滤纯字符串格式等特殊场景
+        // todo: 基于args[0]修改output
+      } else {
+        var array=args[0].match(/(?<=[:|\[|\{|\s+])[0-9]+(?=[\]|\}|,])/gi);
+        // todo: 对位数做判断
+        // 拼接单双引号
+        // todo: 基于args[0]修改output
+      }
+      // return output
+    }
+  ```
+
+  JSON.stringify的逻辑类似,需要逐个场景验证一下
+
+其他周知事项
+  无
+

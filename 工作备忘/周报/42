@@ -1,0 +1,24 @@
+【周报】岳鹏飞 2022/09/25
+
+<fe@lenovocloud.com>;
+<xuyb@lenovocloud.com>;<wangzy@lenovocloud.com>;<yuanlei@lenovocloud.com>;
+
+本周工作内容
+  1. mobx降级
+  2. markdown子应用二次开发
+  3. draw.io子应用二次开发
+  *  实现功能: 登录/注销/基本信息/列目录/预览/编辑/保存/下载/复制/移动/删除/拖拽上传
+
+下周工作安排
+  1. 分库分表neid精度问题联调
+  2. 优化drawio子应用, 目前仅支持iframe模式
+  4. 文件重命名功能. 需要和server沟通接口报错原因
+  5. markdown 拖拽图片上传功能; 上传地址需要沟通
+  6. 解决drawio不兼容微前端框架的问题;
+
+思考体会
+  微前端框架合集: https://juejin.cn/post/7121883538311348238
+  Next.js: https://zhuanlan.zhihu.com/p/419798470
+
+其他周知事项
+  无

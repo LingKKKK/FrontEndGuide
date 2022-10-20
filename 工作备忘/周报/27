@@ -1,0 +1,33 @@
+【周报】岳鹏飞 2022/6/4
+
+<fe@lenovocloud.com>;
+xuyb@lenovocloud.com;<wangzy@lenovocloud.com>;<yuanlei@lenovocloud.com>;
+
+本周工作内容
+  1.信创网盘代码变更review
+  2.portal平台适配
+  3.license平台适配
+  4.开放平台UI适配
+
+下周工作安排
+  1.Web&Server联调
+  2.Web&客户端联调
+  3.信创代码review
+  4.信创提测 (Server & 客户端)
+
+思考体会
+
+其他周知事项
+  无
+
+帮助 - 切换开发人员工具
+截止6.2日, "信创2022"各模块进度如下:
+  1. Web & Server (6.8 ShowCase)
+      未完成:
+        ① 水印相关的链接/预览. 原因: 预览中心无法提供稳定的验证环境
+        ② "管理控制台-敏感信息识别"下的三个页面未调试,问了陈阳是需要portal平台配置
+        ③ "PCS-11568", "PCSONLINE-1270" 这两个遗留问题需要手动修复
+  2. Web & 客户端联调 (未开始)
+      计划: 6.6 ~ 6.8 联调
+      测试内容: 1.js2native 2.基础BVT
+

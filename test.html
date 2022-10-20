@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>test折行</title>
+  <style>
+    .text {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      word-break: break-all;
+      text-overflow: ellipsis;
+      padding: 5px;
+      border: 1px solid #333;
+      position: relative;
+      width: 100%;
+    }
+    .box {
+      display: flex;
+      width: 300px;
+      min-width: 300px;
+    }
+    .text::before {
+      float: right;
+      width: 0;
+      height: calc(100% - 22px);
+      content: '';
+      background: red;
+      /* 这里的样式可以修改一下 */
+    }
+    .text::after {
+      position: absolute;
+      width: 300px;
+      height: 25px;
+      content: '';
+      background: yellow;
+    }
+    .btn {
+      float: right;
+      clear: both;
+      color: #0a64fa;
+    }
+    .exp {
+      display: none;
+    }
+    .exp:checked + .text {
+      -webkit-line-clamp: 999;
+    }
+    .btn::after {
+      content: '展开';
+    }
+    .exp:checked + .text .btn::after {
+      content: '收起';
+    }
+    .exp:checked + .text::after {
+      visibility: hidden;
+    }
+   </style>
+  <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.1/jquery.js"></script>
+</head>
+<body>
+   <div class="item-content box">
+    <input type="checkbox" class="exp" id="exp" />
+    <div class="text">
+      <label class="btn" for="exp"></label>
+      <!-- 短文字短文字短文字短文字 -->
+      长文字长文字长文字长文字长文字长文字长文字长文字
+      长文字长文字长文字长文字长文字长文字长文字长文字
+      长文字长文字长文字长文字长文字长文字长文字长文字
+      长文字长文字长文字长文字长文字长文字长文字长文字
+      长文字长文字长文字长文字长文字长文字长文字长文字
+      长文字长文字长文字长文字长文字长文字长文字长文字
+      长文字长文字长文字长文字长文字长文字长文字长文字
+      长文字长文字长文字长文字长文字长文字长文字长文字
+    </div>
+  </div>
+  <input type="file" id="fileUpload" directory multiple>
+  <script>
+    $(function() {
+      $('input[type=file]').change(function () {
+        var filePath = $('#fileUpload').val();
+        console.log(1111, filePath)
+        console.log(222, this.files[0]);
+        console.log(URL.createObjectURL(event.target.files[0]))
+
+        var path = (window.URL || window.webkitURL).createObjectURL(event.target.files[0]);
+        console.log('path', path);
+
+        var reader = new FileReader();
+        reader.onload = function(e){
+          console.log('1111', e.target.result)
+        }
+        reader.readAsDataURL(event.target.files[0]);
+
+      });
+    })
+  </script>
+</html>

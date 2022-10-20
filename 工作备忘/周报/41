@@ -1,0 +1,25 @@
+【周报】岳鹏飞 2022/09/18
+
+<fe@lenovocloud.com>;
+<xuyb@lenovocloud.com>;<wangzy@lenovocloud.com>;<yuanlei@lenovocloud.com>;
+
+本周工作内容
+  1. 分库分表精度问题检查
+  2. 打通微前端基座模块调用网盘接口 (vite -> webpack4/5)
+  3. 改造markdown子应用
+     已完成: 路由/传参/读取md文件/保存md文件/图片上传功能/导出/导入/移动/复制/删除
+     未完成: 1. 文件重命名(接口报错无法调试)/图片上传地址待确认
+            2. 基座模块降mobx版本
+
+下周工作安排
+  1. mobx降级
+  2. 简化markdown子应用的webpack
+  3. draw.io子应用改造接入
+
+思考体会
+  webpack publicPath vs contentBase: https://blog.csdn.net/wang839305939/article/details/85855967
+  react包容性路由 vs vue排他性路由: http://www.wjhsh.net/marui01-p-13215468.html
+
+其他周知事项
+  无
+

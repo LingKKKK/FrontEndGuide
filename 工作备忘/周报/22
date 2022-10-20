@@ -1,0 +1,37 @@
+【周报】岳鹏飞 2022/5/2
+
+<fe@lenovocloud.com>;
+xuyb@lenovocloud.com;<wangzy@lenovocloud.com>;<yuanlei@lenovocloud.com>;
+
+本周工作内容
+    1. 大巴三期-二轮提测
+    2. code review
+    3. 定位解决遗留问题
+
+下周工作安排
+    1. 将原子权限方法引用重构
+    2. code review
+    3. 做一期开发问题复盘
+
+思考体会
+    最近在看git相关的内容,merge(squash/ff/no-ff)和rebase都是git提供的分支操作方案,都有自己独特的应用场景,目前我们较为常用的就是merge-ff. 对这些操作仅做了概念上的梳理,对应用场景还是比较模糊,没有完全理解透彻.
+    一、commit都包含了那些信息?
+      ```
+      # commit组成
+      ➜  view git:(refactor/atomic) git cat-file commit HEAD
+      tree 4d8f4c3695e2f117cf80148a22f6376d6707d0d4 ->  本次commit目录树和每个对象的hash值
+      parent 8fadfe03a700086069954ac841a951293a6b52bc -> 上一次commit的hash值
+      author xxx <xxx@xxx.com> 1651222630 +0800 -> 作者信息
+      committer xxx <xxx@xxx.com> 1651222630 +0800 -> 本次提交的时间戳
+      # merge时会有多个parent
+      git常用指令: https://www.bookstack.cn/read/git-doc-zh/docs-65.md
+      ```
+    二、分支冲突的判断
+      两个分支中的文件存在差异, 通过两个分支和共有的基分支三个分支来判断是否冲突
+      寻找两个commit的parent, 逐层向上寻找, 直到找到共有的父级commit,并比较差异, 然后合并这两组差异;
+      如果同时修改一处,但内容不同,可视为冲突,需要手动resolve.
+    三、Merge/Squash区别
+      https://wiki.lenovows.com/pages/viewpage.action?pageId=37880264
+
+其他周知事项
+    无

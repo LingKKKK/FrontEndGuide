@@ -1,0 +1,63 @@
+1.为什么在根目录挂载之后,每个目录和组件都可以访问到store中的数据?
+2.为什么修改store中的数,会触发组件的更新?
+3.如何做模块拆分的?
+
+VueX官网地址: https://vuex.vuejs.org/zh/
+
+当一个项目过于庞大,vuex中的状态复杂,随着版本迭代变得越来越难以维护了,此时应该如何优化vuex结构?
+同样,mixin也会遇到这样的问题,如何去维护?
+
+
+# 为什么在跟目录挂载之后, 每个组件实例都能访问到store?
+
+`Vuex`作为`Vue`的插件,需要通过`vue.use()`方法进行注册,在注册的过程中. vue会将自身注入到插件中,并调用插件的install进行安装
+```js packages/weex-vue-framework/factory.js
+  function initUse (Vue) {
+    Vue.use = function (plugin) {
+      var installedPlugins = (this._installedPlugins || (this._installedPlugins = []));
+      if (installedPlugins.indexOf(plugin) > -1) {
+        return this
+      }
+
+      // additional parameters
+      var args = toArray(arguments, 1);
+      args.unshift(this); // !!!
+      if (typeof plugin.install === 'function') {
+        plugin.install.apply(plugin, args); // !!!
+      } else if (typeof plugin === 'function') {
+        plugin.apply(null, args);
+      }
+      installedPlugins.push(plugin);
+      return this
+    };
+  }
+```
+这个操作,实际上就是调用了 `Vue.mixin` 混入了声明周期钩子 `beforeCreate`.
+
+由于组件在`初始化init`过程中会有`从vue构造函数`中`读取mixin`,并`保存静态属性`.
+所以每个组件都会执行到`vuexInit方法`.自然也都会拿到vuex-store中的所有值.
+```js
+function vuexInit () {
+  /**
+   * @Vuex的核心内容
+   * 将所有的 options.store 挂载到 this.$store 上; 这个就是我们实例化的 Store 对象
+   * 在vue实例化组件中, 可以通过 this.$store 访问到 Store 对象
+   */
+  const options = this.$options
+  // store injection
+  if (options.store) {
+    this.$store = typeof options.store === 'function'
+      ? options.store()
+      : options.store
+  } else if (options.parent && options.parent.$store) {
+    this.$store = options.parent.$store // 逐层向上读取store,并合并到自身. 确保取到所有的store
+  }
+}
+```
+
+# 为什么修改vuex中的数据,会触发vue组件的更新
+
+注册完vuex之后, 通过`new Vuex.Store()`方法, 将`vuex`中的`公共数据`或者`公共API``进行挂载`.
+挂载都会执行到 `resetStoreVM` 函数
+和data/computed一样,会跟随组件的初始化逻辑,进行响应式处理. (`initState方法`)
+所以 vuex 驱动视图的更新,也是依靠数据响应式来实现的.

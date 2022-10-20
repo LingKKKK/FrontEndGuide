@@ -1,3 +1,7 @@
+
+# 多个then/catch的链式调用
+[参考](https://blog.csdn.net/Liuer_Qin/article/details/110230078)
+
 # Promise 常用内容
 
     包含了三种状态: pending(等待中) fulfilled|resolve(已成功) reject(已失败)

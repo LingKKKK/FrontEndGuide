@@ -1,0 +1,37 @@
+【周报】岳鹏飞 2022/1/7
+
+<fe@lenovocloud.com>;
+<yuanpeng@lenovocloud.com>;
+<wangzy@lenovocloud.com>;
+<yuanlei@lenovocloud.com>
+
+本周工作内容
+    1. 修复2021_patch6中部分问题
+    2. 了解strapi
+
+下周工作安排
+    1. 解决2021遗留bug
+    2. 梳理国际化文案平台
+
+思考体会
+    1. 对==和===的深度对比
+      https://www.zhihu.com/question/31442029
+      https://www.qinshenxue.com/article/javascript-type-conversion.html
+    2. proxy支持https写法，之前没有配置过https的服务
+
+其他周知事项
+    无任何变动
+
+react fiber 时间切片
+vue 时间切片
+贪心算法的思想
+
+1.proxy对http https写法不同, https需要指定
+2.工单的进度要及时更新
+3.在fix的同时,如果发现存在书写格式不符合规范,是否要进行更正?
+  如果修改的话,工作量比较大
+  如果不修改,问题会越堆越多
+
+https://www.zhihu.com/question/31442029
+https://www.qinshenxue.com/article/javascript-type-conversion.html
+这是 == === 中隐式类型转换， 感觉写的挺好

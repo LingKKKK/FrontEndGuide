@@ -1,0 +1,20 @@
+【周报】岳鹏飞 2022/2/25
+
+<fe@lenovocloud.com>;<yuanpeng@lenovocloud.com>;<wangzy@lenovocloud.com>;<yuanlei@lenovocloud.com>;
+
+本周工作内容
+    1. 原子权限相关代码逻辑梳理
+    2. 代码回顾内容整理
+    3. 梳理版本发布相关的流程和规范
+
+下周工作安排
+    1. 梳理大巴三期需求
+
+思考体会
+    1. 关于提高代码质量的一些想法: https://wiki.lenovows.com/pages/viewpage.action?pageId=32803543
+    2. 大巴2期提测, 漏掉了一些需要merge的内容, 上线前的检查的不够仔细
+
+其他周知事项
+    无
+
+

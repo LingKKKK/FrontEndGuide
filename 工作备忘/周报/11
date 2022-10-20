@@ -1,0 +1,29 @@
+【周报】岳鹏飞 2022/2/18
+
+<fe@lenovocloud.com>;<yuanpeng@lenovocloud.com>;<wangzy@lenovocloud.com>;<yuanlei@lenovocloud.com>;
+
+本周工作内容
+    1. 完成对原子权限逻辑内容梳理
+    2. 完成自定义管理员逻辑内容梳理
+    3. 熟悉工单流转规范
+
+下周工作安排
+    1. 整理代码回顾内容
+    2. 整理码优化重构内容
+
+思考体会
+    二进制的位运算相关内容: https://blog.csdn.net/swty3356667/article/details/78703650
+    解决硬编码耦合:
+      硬编码的问题: 拓展
+      1. 可以用柯里化函数进行封装 (在原子权限梳理中有代码示例)
+      2. 类似vuex中actions的代码，都会建议使用者独立维护一个导出若干常量的文件，比如：
+        export default {
+          GET_LENOVO_LANGUAGE: 'GET_LENOVO_LANGUAGE',
+          GET_USER_INFO: 'GET_USER_INFO'
+        }
+        这就算是一种防止硬编码耦合的方式，你每次修改某个名称时，使用这个常量的地方就统一都得到更改了
+
+其他周知事项
+    无
+
+

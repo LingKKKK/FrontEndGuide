@@ -15,7 +15,7 @@ LeetCode按照怎样的顺序来刷题比较好？ https://zhuanlan.zhihu.com/p/
 2020前端基础包过面试题 https://zhuanlan.zhihu.com/p/92590306
  前后端分离就必须 SPA 吗？ https://www.zhihu.com/question/352047943/answer/993693504
 (2.4w字,建议收藏)😇原生JS灵魂之问(下), 冲刺🚀进阶最后一公里(附个人成长经验分享)   https://zhuanlan.zhihu.com/p/93528023
-继承的类型 https://www.cnblogs.com/humin/p/4556820.html  
+继承的类型 https://www.cnblogs.com/humin/p/4556820.html
 如何用js判断一个对象是不是Array https://www.cnblogs.com/sakura-sakura/p/6678264.html
 JavaScript中各种源码实现（前端面试笔试必备) https://zhuanlan.zhihu.com/p/108289604
 回调地狱  https://upload-images.jianshu.io/upload_images/15311104-f36baae9a21490c7.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200
@@ -111,18 +111,18 @@ adb install -r -d E:\xxx\xxx\xxxx\build\app\outputs\apk\app.apk
 
 
 获取页面中所有参数:
-function GetRequest() {   
+function GetRequest() {
    var url = location.search; //获取url中"?"符后的字串
-   var theRequest = new Object();   
-   if (url.indexOf("?") != -1) {   
-      var str = url.substr(1);   
-      strs = str.split("&");   
-      for(var i = 0; i < strs.length; i ++) {   
-         theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);   
-      }   
-   }   
-   return theRequest;   
-} 
+   var theRequest = new Object();
+   if (url.indexOf("?") != -1) {
+      var str = url.substr(1);
+      strs = str.split("&");
+      for(var i = 0; i < strs.length; i ++) {
+         theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);
+      }
+   }
+   return theRequest;
+}
 
 
 abdcef a在b前 cd不相邻 ef不相邻 cd不在最后
@@ -130,7 +130,7 @@ abdcef a在b前 cd不相邻 ef不相邻 cd不在最后
 
 
 * overflow: hidden;
-* text-overflow: ellipsis; 
+* text-overflow: ellipsis;
 * white-space: nowrap;
 
 

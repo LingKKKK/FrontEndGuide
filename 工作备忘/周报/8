@@ -1,0 +1,41 @@
+【周报】岳鹏飞 2022/1/21
+
+<fe@lenovocloud.com>;<yuanpeng@lenovocloud.com>;<wangzy@lenovocloud.com>;<yuanlei@lenovocloud.com>;
+
+本周工作内容
+    1. 梳理网盘业务权限相关内容
+    2. 修复线上部分遗留bug
+    3. 梳理Vue2.x学习路线
+
+下周工作安排
+    1. 和服务端联调外链预览跨域的问题, 前端基本上不需要改动, 配合服务端找问题;
+    2. 梳理Vue2.x学习路线
+    3. 原子操作相关的业务逻辑和代码梳理
+    4. 修复线上遗留bug
+
+思考体会
+    1. mixin
+       mixin随着项目复杂度增加, 使用的频率也越来越高. 做代码梳理的时候, 比较麻烦, 代码也没有响应的注释; 如果同时引入多个, 查找起来费点事.
+       在思考有什么方法/策略可以优化一下
+    2. 关于代码的可读性
+       我看到代码里面很多使用三目运算来替代if else, 我觉得这个需要自己把控一下,
+       不是所有的场景都适用, 如果层级太深, 使用if else 效果更佳.
+       代码最重要的就是简单易读.
+
+其他周知事项
+    无任何变动
+
+
+
+mixin量级太大了,对项目不熟悉,找起来还是比较麻烦的
+
+和现场/实施的沟通, 对版本的把控
+
+代码中出现了多层ternary嵌套的写法,本身ternary是对条件判断的一种优化, 但是需要分情况, 层级太多时是一种反优化手段
+http://cn.voidcc.com/question/p-vjjyxwpl-zt.html
+
+https://code.lenovows.com/lenovocloud/css/prrd/6.0/entcloud-web-group/view/merge_requests/2268/diffs
+
+简单有效易读, 就是好的代码, 并非要使用有逼格的写法
+
+ternary
